@@ -1,0 +1,8 @@
+alpha = { 'a'..'z' | 'A'..'Z' }
+digit = { '0'..'9' }
+ident = { alpha+ }
+num = { digit+ }
+product = { num ~ " " ~ ident }
+products = { product ~ (", " ~ product)* }
+formula = { products ~ " => " ~ product}
+formulas = { formula ~ ("\n" ~ formula)* }
