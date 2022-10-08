@@ -1,4 +1,4 @@
-module IntCode (State(..),run,runWhile,step,push,pop,initialState) where
+module IntCode (State(..),run,runWhile,runUntilInput,step,push,pop,clear,initialState) where
 
 import qualified Data.Map as M
 import qualified System.Environment as E
@@ -38,6 +38,9 @@ pop s = case output s of
     (x:xs)  -> (x,s { output = xs })
     _       -> (0, s)
 
+clear :: State -> State
+clear s = s { output = [] }
+
 type Memory = M.Map Integer Integer
 
 readM :: Integer -> Memory -> Integer
@@ -68,6 +71,18 @@ runWhile :: (State -> Bool) -> State -> State
 runWhile p s
   | p s = let s' = step s in if (halted s') then s' else runWhile p s'
   | otherwise = s
+
+runUntilInput :: State -> State
+runUntilInput state = 
+  let (instr, args) = parseState state
+  in
+    if halted state
+      then state
+      else
+        case instr of
+          Input | null (input state) -> state
+          _ -> runUntilInput $ applyInstr instr args state
+
 
 runD :: State -> IO State
 runD s = do 
